@@ -1,0 +1,22 @@
+"VertexLitGeneric"
+{
+	$model 1 
+	$basetexture "models\heroes\luna\luna_helmet_color"
+	$bumpmap "models\heroes\luna\luna_helmet_normal"
+
+	$alphatest "1"
+ 
+	$phong 				1 
+	$phongexponent 30
+	$phongboost 3
+	$phongexponenttexture "models/heroes/luna/luna_body_exponent"
+	$phongtint "[.8 1 1]"
+	
+	
+	$rimlight 1
+	$rimmask 1
+	$rimlightboost 3
+	$RIMLIGHTCOLOR "[.8 1 1]"
+ 
+ 
+}

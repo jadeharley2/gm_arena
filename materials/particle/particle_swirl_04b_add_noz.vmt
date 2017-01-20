@@ -1,0 +1,7 @@
+SpriteCard
+{
+$basetexture "particle\particle_swirl_04b"
+$additive 1
+
+$ignorez 1
+}

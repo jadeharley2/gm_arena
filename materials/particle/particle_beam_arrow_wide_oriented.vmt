@@ -1,0 +1,9 @@
+SpriteCard
+{
+$basetexture "particle/particle_beam_arrow_wide"
+
+$nocull 1
+$splinetype 1
+$depthblend 0
+$orientation 3
+}

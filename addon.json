@@ -1,0 +1,11 @@
+{
+	"title"		:	"55679864879",
+	"type"		:	"ServerContent",
+	"tags"		:	[ ],
+	"ignore"	:
+	[
+		"*.psd",
+		"*.vcproj",
+		"*.svn*"
+	]
+}

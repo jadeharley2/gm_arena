@@ -1,0 +1,8 @@
+SpriteCard
+{
+$basetexture "particle\particle_ring_pulled"
+
+$overbrightfactor 2
+$addself 1
+
+}

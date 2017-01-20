@@ -1,0 +1,11 @@
+SpriteCard
+{
+$basetexture "particle/beam_smoke_03_modulate_dark.vtf"
+$translucent 1
+$nocull 1
+$splinetype 1
+
+$mod2x 1
+
+
+}

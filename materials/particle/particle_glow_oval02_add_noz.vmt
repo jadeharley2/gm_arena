@@ -1,0 +1,9 @@
+SpriteCard
+{
+$basetexture "particle\particle_glow_oval02"
+
+$ignorez 1
+$additive 1
+
+
+}

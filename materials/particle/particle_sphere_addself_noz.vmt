@@ -1,0 +1,6 @@
+SpriteCard
+{
+$basetexture "particle/particle_sphere"
+$addself 2
+$ignorez 1
+}

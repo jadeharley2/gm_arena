@@ -1,0 +1,10 @@
+Projected
+{
+$basetexture "particle\Particle_Ring_AOE_default"
+$additive 1
+$translucent 1
+
+
+
+
+}

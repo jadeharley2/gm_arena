@@ -1,0 +1,7 @@
+SpriteCard
+{
+$basetexture "particle\particle_ring_edgeglow"
+
+$overbrightfactor 2
+
+}

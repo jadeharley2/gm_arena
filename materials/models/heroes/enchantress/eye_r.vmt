@@ -1,0 +1,7 @@
+"eyes"
+{
+	"$basetexture" "models/heroes/enchantress/eye"
+	"$iris" "models/heroes/enchantress/pupil"
+	"$halflambert" "1"
+
+}

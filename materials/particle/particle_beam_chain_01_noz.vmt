@@ -1,0 +1,10 @@
+SpriteCard
+{
+$basetexture "particle/beam_chain"
+
+$nocull 1
+$splinetype 1
+$depthblend 0
+
+$ignorez 1
+}

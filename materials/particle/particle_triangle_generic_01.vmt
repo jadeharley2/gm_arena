@@ -1,0 +1,10 @@
+SpriteCard
+{
+$basetexture "particle/particle_triangle_generic_01"
+$addself 1
+$depthblend 0
+$maxsize .75
+$startfadesize .575
+$endfadesize .65
+
+}

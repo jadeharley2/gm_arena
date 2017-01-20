@@ -1,0 +1,10 @@
+SpriteCard
+{
+$basetexture "particle\particle_glow_irregular2"
+$translucent 1
+
+$mod2x 1
+
+
+
+}

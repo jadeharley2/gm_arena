@@ -1,0 +1,10 @@
+Projected
+{
+$basetexture "particle\particle_ring_wave_crisp"
+$additive 1
+$translucent 1
+
+
+
+
+}

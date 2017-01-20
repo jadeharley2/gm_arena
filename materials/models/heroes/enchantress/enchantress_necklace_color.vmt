@@ -1,0 +1,21 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/heroes/enchantress/enchantress_necklace_color" 
+	"$model" "1"   
+	
+	"$bumpmap" "models/heroes/enchantress/enchantress_necklace_normal" 
+	
+	"$phong" "1" 
+	
+	"$phongexponent" "2"
+	"$phongboost" "0.02"
+	"$phongalbedotint" "1"
+	"$phongtint" "[1 .95 1.95]"
+	"$phongfresnelranges"	"[0.5 6 10]"
+	
+	$alphatest 1 
+	
+	$rimlight               1
+	$rimlightexponent       2
+	$rimlightboost          3
+}
