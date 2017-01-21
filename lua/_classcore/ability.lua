@@ -53,8 +53,12 @@ end
 function AB:Cast(ent) 
 	self.nextcast = self.nextcast or 0
 	if self.Begin != nil and self.nextcast<CurTime() then
-		local trace = 0
-		if self.type == "target" then trace = ent:GetEyeTrace() end
+		local trace = ent:GetEyeTrace()//= 0
+		//if self.type == "target" or  self.type == "projectile" then 
+		//trace = 
+		 
+		//end
+
 		if self:Begin(ent,trace) then
 			//MsgN("cast")
 			ent.meffects = ent.meffects or {}

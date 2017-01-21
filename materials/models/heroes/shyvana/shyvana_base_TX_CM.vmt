@@ -1,6 +1,6 @@
 "VertexLitGeneric"
 {
-	"$basetexture" "models/heroes/bard/Bard_Base_TX_CM" 
+	"$basetexture" "models/heroes/shyvana/shyvana_base_TX_CM" 
 	"$model" "1"   
 	
 	//"$bumpmap" "models/heroes/enchantress/enchantress_body_normal" 
@@ -15,8 +15,5 @@
 	
 	$rimlight               1
 	$rimlightexponent       2
-	$rimlightboost          2
-	
-    $selfillum 1 
-    $selfillummask "models/heroes/bard/Bard_Lum" 
+	$rimlightboost          3
 }

@@ -54,9 +54,9 @@ function BehaviorGraphMeta:SetState(name)
 	end
 	if self._cstate then
 		from = self._cstate
-		//MsgN("changing state: ",from.name," => ",to.name)
+		if self.debug then MsgN("changing state: ",from.name," => ",to.name) end
 	else
-		MsgN("starting graph with state: ",to.name)
+		if self.debug then MsgN("starting graph with state: ",to.name) end
 	end 
 	self._cstate = to
 	if self._cstate.enter then 

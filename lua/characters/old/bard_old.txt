@@ -3,7 +3,19 @@ AddCSLuaFile()
 Dota.AddCharacter({  
 	name = "bard",
 	model = "models/heroes/bard/bard.mdl",
-	move_allow_forward45 = true,  
+	move_allow_forward45 = true, 
+	animations = {
+		//format 
+		// name = { anims, specials, sounds }
+		idle = { {"idle"}, {"idlespecial"},{},loop = true},
+		walk = { {"floatrun"}, {},{},loop = true},
+		run = { {"floatrun"}, {},{},loop = true},  
+		attack = { {"attack1","attack3","attack3"}},
+		  
+		death = "death",
+		spawn = "spawn",
+		social_1 = { 10, start = "dance", loop = "dance_loop"}, 
+	},  
 	spells = { 
 		{"l_attack_ranged"},   
 		//{"l_social", key = KEY_LCONTROL}

@@ -75,7 +75,31 @@ sound.Add( {
 Dota.AddCharacter({  
 	name = "kindred",
 	model = "models/heroes/kindred/kindred.mdl",
-	move_allow_forward45 = true,  
+	move_allow_forward45 = true, 
+	animations = {
+		//format 
+		// name = { anims, specials, sounds }
+		idle = { {"idle"}, {"idlespecial"},{},loop = true},
+		walk = { {"run"}, {"runspecial"},{},loop = true},
+		run = { {"runfast"}, {},{},loop = true}, 
+		run_injured = { {"runinjured"}, {},{},loop = true},
+		attack = { {"attack1","attack3","attack4"}},
+		
+		casts1f = "cast_s1f",
+		casts1b = "cast_s1b", 
+		casts1r = "cast_s1r",
+		casts1l = "cast_s1l",
+		casts2 = "cast_s2",
+		casts3 = "cast_s3",
+		casts32 = "cast_s3_2",
+		casts4 = "cast_s4",
+		recall = "recall",
+		  
+		death = "death",
+		spawn = "spawn",
+		social_3 = "dance",
+		social_4 = "taunt",  
+	},  
 	spells = { 
 		{"l_attack_ranged"}, //, inkey = IN_ATTACK
 		//{"kindred_mark"}, //passive

@@ -68,6 +68,7 @@ BGCOND = {}
 BGACT = {}
 BGUTIL = {}
 
+function BGCOND.RND01P() return math.random(1,10000)<10 end 
 function BGCOND.RND1P() return math.random(1,10000)<100 end 
 function BGCOND.RND10P() return math.random(1,10000)<1000 end 
 function BGCOND.ANMFIN(s) return s.anim_end<CurTime() end 
@@ -90,7 +91,7 @@ end
 function BGUTIL.KPRESS(e,key) 
 	return UTILS_IsKeysPressed(e,key)
 end 
-function BGUTIL.ABREADY(e,abname) 
+function BGUTIL.ABREADY(e,abname)  
 	//MsgN(abname," = ",e.abilities[abname] and e.abilities[abname]:Ready())
 	return e.abilities[abname] and e.abilities[abname]:Ready()
 end
@@ -101,5 +102,5 @@ function BGACT.SETSPD(e,sp)
 	if sp == 0 then sp = 0.0001 end
 	e:SetWalkSpeed(sp)  
 	e:SetRunSpeed(sp) 
-end
-
+end 
+ 

@@ -91,34 +91,36 @@ function SafeCall(obj, func, ...)
 	local fl = obj[func]
 	if fl != nil then 
 		return fl(obj,...)
-	end
-end 
-      
+	end 
+end  
+       
 function Dota.AddCharacter(htab) 
-	for k,v in pairs(htab.animations) do
-		if isstring(v) then // abc = "anim1"
-			v = { a =  {v} }
-		else
-			if isstring(v[1]) then //abc = {"anim1","anim2"}
-				v = { a = v }
-			else 
-				local nv = { a = v[1]}   
-				if v[2] then
-					nv["p"] = v[2]
-				end 
-				if v[3] then
-					nv["s"] = v[3]
-				end 
-				if v.loop then
-					nv.l = v.loop
-				end
-				v = nv
-			end  
+	if htab.animations then 
+		for k,v in pairs(htab.animations) do
+			if isstring(v) then // abc = "anim1"
+				v = { a =  {v} }
+			else
+				if isstring(v[1]) then //abc = {"anim1","anim2"}
+					v = { a = v }
+				else    
+					local nv = { a = v[1]}   
+					if v[2] then
+						nv["p"] = v[2]
+					end 
+					if v[3] then
+						nv["s"] = v[3]
+					end 
+					if v.loop then 
+						nv.l = v.loop
+					end
+					v = nv
+				end  
+			end
+			htab.animations[k] = v
 		end
-		htab.animations[k] = v
 	end
 	htab.keyhook = {}
-	htab.inkeyhook = {}
+	htab.inkeyhook = {} 
 	for k,v in pairs(htab.spells) do 
 		if v.key then htab.keyhook[v.key] = v[1] end
 		if v.inkey then htab.inkeyhook[v.inkey] = v[1] end
@@ -385,7 +387,7 @@ local function HOOK_PlayerSpawn( ply )
 		Dota.PlaySequence2(ply, "spawn",true)      
 		return true
 	end   
-end         
+end          
 local lastthink = {}
 local function HOOK_PlayerPostThink( ply )
 	if(ply.dotahero!=nil) and ply:Alive() then
@@ -400,7 +402,7 @@ local function HOOK_PlayerPostThink( ply )
 			local maxhp =  ply.stats.health or 100
 			ply:SetHealth(math.Min( hp+hpregen*delta,maxhp)) 
 		end
-		if ply._angraph then
+		if ply._angraph and SERVER then
 			ply._angraph:Run()  
 		end
 	end  
@@ -430,30 +432,30 @@ local function HOOK_CalcMainActivity( ply, vel )
 		local timestamp = ply.dh_seqts or -1
 		local cts = ply:GetCycle()
 		if curact != -1 then
-			if reset then
+			if reset then 
 				ply.dh_seqreset = false
 				ply:SetCycle(0)
-			end
+			end 
 			result = curact 
 		end
-		if true then  
-		return 0,result end 
+		if true then   
+		return 0,result end  
 	end
-end
+end 
 local function HOOK_UpdateAnimation( ply, vel )
 	if(ply.dotahero!=nil and not ply.dotahero.isplayermodel) then 
 		return true
 	end
-end
+end   
 local function HOOK_PlayerFootstep( ply, pos, foot, sound, volume, rf )
 	if(ply.dotahero!=nil and not ply.dotahero.isplayermodel) then 
-		return true
-	end
-end
+		return true  
+	end 
+end    
 local function HOOK_SetupMove( ply, mv, cmd )
 	if(ply.dotahero!=nil and not ply.dotahero.isplayermodel) then 
 		local controller = ply:GetNWEntity("owner")
-		if SERVER then
+		if SERVER then  
 			local mount = ply.mount
 			if mount != nil and mount != NULL then
 				local speedmul = 1 if mv:KeyDown(IN_SPEED) then speedmul = 2 end
@@ -512,29 +514,29 @@ local function HOOK_SetupMove( ply, mv, cmd )
 		//if  math.Rand( 1,10000 ) > 9990 then
 		//	mv:SetButtons( IN_JUMP)
 		//end
-		
+		 
 		local isCasting = false //ply.dh_seqid!=ply.dotahero.a_cast 
 		local isRunning = mv:KeyDown(IN_SPEED)
 		local isInVehicle = ply:InVehicle()
 		local isWalking = false
 		local isInjured = false
-		
+		 
 		local prevrun = ply.dh_prevrun or false
 		local firstrun = false
 		if not prevrun and mv:KeyDown( IN_FORWARD) then
 			firstrun = true   
-		end 
+		end  
 		ply.dh_prevrun = mv:KeyDown( IN_FORWARD)
-		 
-		if mv:KeyDown( IN_FORWARD) and not isCasting then 
-			if mv:KeyDown(IN_SPEED) then   
-				Dota.PlaySequence2(ply, "run",firstrun)  
-			else
-				Dota.PlaySequence2(ply, "walk",firstrun)   
-			end 
-		else  
-			Dota.PlaySequence2(ply, "idle")  
-		end                      
+		   
+		//if mv:KeyDown( IN_FORWARD) and not isCasting then 
+		//	if mv:KeyDown(IN_SPEED) then   
+		//		Dota.PlaySequence2(ply, "run",firstrun)  
+		//	else
+		//		Dota.PlaySequence2(ply, "walk",firstrun)   
+		//	end 
+		//else  
+		//	Dota.PlaySequence2(ply, "idle")  
+		//end                        
 		if not isInVehicle then
 			//if mv:KeyDown( IN_DUCK) then
 			//	local kh_d = ply.dotahero.keyhook[IN_DUCK]
@@ -568,8 +570,8 @@ local function HOOK_FindUseEntity(  ply,  defaultEnt )
 		end 
 	end 
 	    
-end    
-   
+end     
+       
 function UTILS_IsKeysPressed(ray,buttonray) 
 	if ray.IsPlayer then
 		ray = ray.keyspressed or {}
@@ -580,13 +582,13 @@ function UTILS_IsKeysPressed(ray,buttonray)
 		end
 	elseif isnumber(buttonray) then
 		return ray[buttonray] == true
-	end
-	return true
-end  
+	end 
+	return true 
+end       
 local function HOOK_PlayerButtonDown(  ply,  button  ) 
 	if SERVER and ply.dotahero then
 		ply.keyspressed = ply.keyspressed or {}
-		ply.keyspressed[button] = true
+		ply.keyspressed[button] = true 
 		
 		for k,v in pairs(ply.dotahero.keyhook) do
 			if isnumber(k) then
@@ -601,8 +603,8 @@ local function HOOK_PlayerButtonDown(  ply,  button  )
 		end
 		//local kh_d = ply.dotahero.keyhook[button]
 		//if kh_d then Dota.Cast(ply, kh_d) end
-	end
-end 
+	end 
+end   
 local function HOOK_PlayerButtonUp(  ply,  button  ) 
 	if SERVER and ply.dotahero then
 		ply.keyspressed[button] = nil 

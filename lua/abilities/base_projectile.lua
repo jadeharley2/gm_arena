@@ -12,6 +12,11 @@ ability.projectile =
 	removeontouch = true,
 	removeoneffectstart = true,
 	color = Color(0,0,0,0),
+	trailcolor = Color(100,200,250),
+	trailwidthstart = 20,
+	trailwidthend = 0,
+	trailmaterial = "trails/laser.vmt",
+	hitsound = nil,
 }
  
 function ability:Begin(ply, trace) 
@@ -20,11 +25,11 @@ function ability:Begin(ply, trace)
 		if self.startpos == "eyepos" then
 			spos = ply:EyePos()
 		elseif self.startpos == "attachment" then
-			local att = self.attachment
-			if isstring(att) then att = ply:LookupAttachment(att) end
+			local att = self.attachment 
+			if isstring(att) then att = ply:LookupAttachment(att) end 
 			if att >= 0 then
-				spos = ply:GetAttachment(att)
-			end
+				spos = (ply:GetAttachment(att) or {}).Pos
+			end 
 		elseif self.startpos == "world" then
 			spos = self.worldposition
 		end
@@ -42,13 +47,24 @@ function ability:Begin(ply, trace)
 				e:SetRenderMode( RENDERMODE_NORMAL ) 
 			end
 			e:Spawn()
-			//e:SetVelocity( )
-			util.SpriteTrail(e, 0, Color(100,200,250) ,true, 20, 0, 1, 1 / ( 20 ) * 0.5, "trails/laser.vmt" )
-			e:GetPhysicsObject():SetMass(pd.mass)
-			e:GetPhysicsObject():SetVelocityInstantaneous(ply:EyeAngles():Forward()*pd.speed )
 			timer.Simple(4,function() if e and e != NULL then e:Remove() end end) 
-			//e:SetCollisionGroup( COLLISION_GROUP_WORLD  )
+			e.ab = self
 			e.projectileOwner = ply
+			//e:SetVelocity( )
+			local material =pd.trailmaterial or "trails/laser.vmt" 
+			if not string.EndsWith( material, ".vmt" ) then
+				material = material..".vmt"
+			end
+			util.SpriteTrail(e, 0, pd.trailcolor ,true, pd.trailwidthstart, pd.trailwidthend, 1,
+				1 / ( pd.trailwidthstart+pd.trailwidthend ) * 0.5, material)
+				
+				
+			local targetVel = (trace.HitPos  - spos):GetNormalized()*pd.speed
+			e:PhysicsInitSphere( 2, "default_silent" )
+			e:SetCollisionBounds( Vector( -2, -2, -2 ), Vector( 2, 2, 2 ) )
+			e:GetPhysicsObject():SetMass(pd.mass)
+			e:GetPhysicsObject():SetVelocityInstantaneous(targetVel)//ply:EyeAngles():Forward()*pd.speed )
+			//e:SetCollisionGroup( COLLISION_GROUP_WORLD  )
 			e:SetCustomCollisionCheck(true)
 			ply:SetCustomCollisionCheck(true)
 			//MsgN(ply)
@@ -62,6 +78,11 @@ function ability:Begin(ply, trace)
 end  
 
 function ability:OnTouch(ent,data)
+	if ent.ab then
+		if ent.ab.projectile.hitsound then
+			ent:EmitSound( ent.ab.projectile.hitsound )
+		end
+	end
 	if data.HitEntity and data.HitEntity != NULL and data.HitEntity !=game.GetWorld() then 
 		local meffect = MagicEffect(self.effect)
 		meffect.owner = ent.projectileOwner
