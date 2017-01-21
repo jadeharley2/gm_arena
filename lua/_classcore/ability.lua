@@ -92,6 +92,10 @@ function AB:Dispell()
 	ent.meffects[self.id] = nil
 	//MsgN("dispelled")
 end
+function AB:Ready()
+	self.nextcast = self.nextcast or 0
+	return ( self.Begin != nil and self.nextcast<CurTime())
+end
 
 AB.__index = AB
 //AB.__newindex = AB

@@ -17,6 +17,6 @@
 	$rimlightexponent       2
 	$rimlightboost          2
 	
-    $selfillum 1
+    $selfillum 1 
     $selfillummask "models/heroes/bard/Bard_Lum" 
 }

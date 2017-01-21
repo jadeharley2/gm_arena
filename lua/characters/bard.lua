@@ -14,11 +14,11 @@ Dota.AddCharacter({
 		  
 		death = "death",
 		spawn = "spawn",
-		social_1 = {"dance",{},{},loop = true}, 
+		social_1 = { 10, start = "dance", loop = "dance_loop"}, 
 	},  
 	spells = { 
-		{"l_attack_ranged", key = IN_ATTACK},   
-		{"kindred_social", key = IN_ATTACK2}
+		{"l_attack_ranged", inkey = IN_ATTACK},   
+		{"l_social", key = KEY_LCONTROL}
 		
 	}, 
 	stats = {
