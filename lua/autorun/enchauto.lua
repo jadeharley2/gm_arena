@@ -379,28 +379,28 @@ local function HOOK_PlayerButtonDown(  ply,  button  )
 		for k,v in pairs(ply.dotahero.keyhook) do
 			if isnumber(k) then 
 				if UTILS_IsKeysPressed(ply.keyspressed, {k}) then
-					Dota.Cast(ply, v)
+					Dota.Cast(ply, v) 
 				end
 			elseif istable(k) then 
 				if UTILS_IsKeysPressed(ply.keyspressed, k) then
-					Dota.Cast(ply, v)
-				end 
+					Dota.Cast(ply, v) 
+				end   
 			end 
-		end
+		end 
 		//local kh_d = ply.dotahero.keyhook[button]
 		//if kh_d then Dota.Cast(ply, kh_d) end
 	end   
 end    
 local function HOOK_PlayerButtonUp(  ply,  button  ) 
 	if SERVER and ply.dotahero then
-		ply.keyspressed[button] = nil 
-	end  
+		ply.keyspressed[button] = nil  
+	end    
 end 
 local function HOOK_KeyPress(  ply,  button  )
 	if SERVER and ply.dotahero then
 		local kh_d = ply.dotahero.inkeyhook[button]
 		if kh_d then Dota.Cast(ply, kh_d) end
-	end
+	end 
 end
 hook.Add( "SetupMove", "DOTAHERO",  HOOK_SetupMove)
 hook.Add( "PlayerLoadout", "DOTAHERO",HOOK_PlayerLoadout )
@@ -418,7 +418,7 @@ hook.Add( "PlayerButtonDown", "DOTAHERO", HOOK_PlayerButtonDown )
 hook.Add( "PlayerButtonUp", "DOTAHERO", HOOK_PlayerButtonUp )
 hook.Add( "KeyPress", "DOTAHERO", HOOK_KeyPress )
 //hook.Add( "DoAnimationEvent", "DOTAHERO", HOOK_DoAnimationEvent )
-  
+   
 concommand.Add( "arena_setchar", function(ply,cmd,args)
 	local e = (oldEntity or Entity)(tonumber(args[1]))
 	if e then

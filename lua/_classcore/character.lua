@@ -108,6 +108,7 @@ function character.Set(ent,name)
 		//MsgN(char)
 		//PrintTable(char)
 		if char then 
+			UnInitCharacter(ent)
 			ent.dotahero = char
 			local eid = ent:EntIndex()
 			InitCharacter(ent)
