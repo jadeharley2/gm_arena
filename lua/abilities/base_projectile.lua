@@ -4,6 +4,7 @@ ability.type = "projectile"
 ability.cooldownDelay = 2
 ability.effect = "heal"
 ability.startpos = "eyepos"
+ability.sound = nil
 ability.projectile = 
 { 
 	model = "models/props_junk/PopCan01a.mdl",
@@ -33,7 +34,9 @@ function ability:Begin(ply, trace)
 		elseif self.startpos == "world" then
 			spos = self.worldposition
 		end
-		
+		if self.sound then 
+			ply:EmitSound( self.sound )
+		end
 		if spos then
 			local e = ents.Create("prop_physics")
 			local pd = self.projectile

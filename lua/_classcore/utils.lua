@@ -25,3 +25,10 @@ function UTILS_AddClass(sfile,cfunc,cname)
 	_G[cname] = oldc or {}
 	return result
 end 
+
+function UTILS_SafeCall(obj, func, ...)
+	local fl = obj[func]
+	if fl != nil then 
+		return fl(obj,...)
+	end 
+end  

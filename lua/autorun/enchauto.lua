@@ -4,25 +4,10 @@ AddCSLuaFile()
 include("_classcore/init.lua")
  
  
-   
  
-//player_manager.AddValidModel( "enchantress", "models/heroes/enchantress/enchantress.mdl" )
-
-
 Dota = Dota or {}
-Dota.heroes = {}
-Dota.spells = {}
-
-
  
-local heroesf = file.Find( "characters/*.lua", "LUA"  )
-for k,v in pairs(heroesf) do 
-	AddCSLuaFile("characters/"..v)
-	include("characters/"..v)
-	//local data = file.Read( v, "LUA" )
-	//RunString( data, "DotaHero" )
-end
-
+ 
 if SERVER then
 	util.AddNetworkString( "dota_hero_event" )
 end
@@ -61,137 +46,7 @@ local function nReceive( len, pl )
 end 
 
 net.Receive( "dota_hero_event", nReceive)
-
-function Dota.SetHero(ent,hero)
-	if hero == nil then 
-		Dota.UnInit(ent)
-		local eid = ent:oldEntIndex()
-		if SERVER then
-			for k,v in pairs(player.oldGetAll()) do 
-				v:SendLua("Dota.SetHero(oldEntity("..tostring(eid).."))")
-			end
-		end 
-	else
-		ent.dotahero = Dota.heroes[hero]
-		local eid = ent:oldEntIndex()
-		Dota.InitHero(ent)
-		if SERVER then
-			MsgN("Dota.SetHero(oldEntity("..tostring(eid).."),'"..hero.."')")
-			for k,v in pairs(player.oldGetAll()) do 
-				v:SendLua("Dota.SetHero(oldEntity("..tostring(eid).."),'"..hero.."')")
-			end
-		end
-	end  
-end
-function Dota.GetHero(ent) 
-	return (ent.dotahero or {}).name
-end
  
-function SafeCall(obj, func, ...)
-	local fl = obj[func]
-	if fl != nil then 
-		return fl(obj,...)
-	end 
-end  
-       
-function Dota.AddCharacter(htab) 
-	if htab.animations then 
-		for k,v in pairs(htab.animations) do
-			if isstring(v) then // abc = "anim1"
-				v = { a =  {v} }
-			else
-				if isstring(v[1]) then //abc = {"anim1","anim2"}
-					v = { a = v }
-				else    
-					local nv = { a = v[1]}   
-					if v[2] then
-						nv["p"] = v[2]
-					end 
-					if v[3] then
-						nv["s"] = v[3]
-					end 
-					if v.loop then 
-						nv.l = v.loop
-					end
-					v = nv
-				end  
-			end
-			htab.animations[k] = v
-		end
-	end
-	htab.keyhook = {}
-	htab.inkeyhook = {} 
-	for k,v in pairs(htab.spells) do 
-		if v.key then htab.keyhook[v.key] = v[1] end
-		if v.inkey then htab.inkeyhook[v.inkey] = v[1] end
-	end
-	//PrintTable(htab.animations) 
-	MsgN("Character added: "..htab.name) 
-	Dota.heroes[htab.name] = htab
-end  
-   
-function Dota.AddSpell(htab)
-	MsgN("Spell added: "..htab.name)  
-	Dota.spells[htab.name] = htab 
-end
-function Dota.InitHero(ent) 
-	local hero = ent.dotahero
-	SafeCall(ent,"StripWeapons")
-	ent:SetModel(hero.model) 
-	ent.abilities = {}
-	ent.stats = {}
-	for k,v in pairs(hero.spells) do 
-		local name = v[1]
-		local ab = Ability(name)
-		ab.owner = ent
-		ent.abilities[name] = ab 
-	end
-	Dota.UpdateLevel(ent,1) 
-	if hero.speed_walk then
-		ent:SetWalkSpeed(hero.speed_walk)
-	end
-	if hero.speed_run then
-		ent:SetRunSpeed(hero.speed_run)
-	end
-	if hero.func_behavior then 
-		local bg = BehaviorGraph(ent) 
-		hero.func_behavior(ent,bg)
-		ent._angraph = bg 
-	end
-	
-	if ent.dotahero.func_onspawn then ent.dotahero.func_onspawn(ent) end
-end
-function Dota.UpdateLevel(ent,level)
-	local hero = ent.dotahero
-	if hero then
-		level = level or ent.level or 1
-		ent.level = level
-		ent.stats = ent.stats or {}
-		for k,v in pairs(hero.stats) do
-			if k == "attackspeed" then
-				ent.stats[k] = v[1]+v[1]*v[2]*level/100
-			else
-				ent.stats[k] = v[1]+v[2]*level
-				if k == "health" then
-					ent:SetHealth(ent.stats[k])
-				end
-			end
-		end
-		local abr = ent.abilities["l_attack_ranged"]
-		if abr then
-			abr.cooldownDelay = ent.stats.attackspeed
-			MsgN(abr.cooldownDelay)
-		end
-	end
-end
-function Dota.UnInit(ent)
-	if ent.dotahero then
-		if ent.dotahero.func_ondespawn then ent.dotahero.func_ondespawn(ent) end
-		ent.dotahero = nil
-		ent._angraph = nil 
-		ent:SetModel("")
-	end 
-end  
 
   
 function Dota.Cast(ply, name)//SERVER
@@ -204,59 +59,6 @@ function Dota.Cast(ply, name)//SERVER
 	end
 	return false
 end 
-function Dota.CastOLD(ply, name)//SERVER
-	local spell = Dota.spells[name]
-	if not spell then return false end
-	ply.dh_spellinfo = ply.dh_spellinfo or {} 
-	local spellinfo = ply.dh_spellinfo[spell.name]
-	if not spellinfo then 
-		ply.dh_spellinfo[spell.name] = {} 
-		spellinfo = {} 
-	end
-	local lastcastdelay = spellinfo.lastcast or 0
-	
-	if lastcastdelay < CurTime() then 
-		spellinfo.lastcast = CurTime() + spell.cooldown
-		
-		local castresult = true
-		local trace = ply:GetEyeTrace()
-		
-		if spell.func_cast then
-			castresult = spell.func_cast(spell, ply, trace)
-		end 
-		if castresult then
-			if spell.animation then Dota.PlaySequence2(ply, spell.animation,castresult) end
-			if spell.sound then ply:EmitSound( table.Random(spell.sound) ) end
-			if spell.func_dispell then
-				timer.Simple(spell.duration,function() spell.func_dispell(spell, ply) end)
-			end
-			//local eyet = ply:GetEyeTrace()
-			//if SERVER then
-			//	local orent = Entity(0)
-			//	orent:StopParticles()
-			//	ply:StopParticles()
-			//	//if ply.dotahero == Dota.heroes.enchantress then
-			//		local off = (eyet.HitPos - orent:GetPos()) 
-			//		local off2 = off +Vector(0,0,5000)/50
-			//		local effname ="enchantress_natures_attendants_lvl4"
-			//		StartEffects(ply,"enchantress_natures_attendants_orig")
-			//		StartEffects(ply,"enchantress_natures_attendants_heal")
-			//		StartEffects(ply,"enchantress_natures_attendants_heal_aura") 
-			//		//StartEffects(ply,"enchantress_natures_attendants_lvl4")  
-			//		//local eyet = ply:GetEyeTrace()
-			//		if eyet.Entity and eyet.Entity != NULL then
-			//			MagicEffect("heal"):Cast(eyet.Entity)
-			//		end
-			//		if SERVER then
-			//			if ply.dotahero.s_cast then ply:EmitSound( ply.dotahero.s_cast ) end
-			//		end
-            //
-			//end 
-			return true
-		end
-	end 
-	return false
-end
 
 local CMoveData = FindMetaTable( "CMoveData" )
 function CMoveData:RemoveKeys( keys ) 
@@ -375,8 +177,8 @@ end
 local function HOOK_PlayerSetModel( ply )
 	if(ply.dotahero!=nil) then
 		ply:SetModel( ply.dotahero.model )
-	end 
-end     
+	end  
+end          
 local function HOOK_PlayerSpawn( ply ) 
 	if(ply.dotahero!=nil) then
 		local de = ply.death_ent
@@ -384,17 +186,17 @@ local function HOOK_PlayerSpawn( ply )
 			de:Remove() 
 			ply.death_ent = nil
 		end
-		Dota.PlaySequence2(ply, "spawn",true)      
-		return true
-	end   
-end          
+		//Dota.PlaySequence2(ply, "spawn",true)      
+		return true 
+	end      
+end             
 local lastthink = {}
 local function HOOK_PlayerPostThink( ply )
 	if(ply.dotahero!=nil) and ply:Alive() then
 		local last = lastthink[ply]
 		if not last then lastthink[ply] = CurTime() last = CurTime() end
 		local cur = CurTime()
-		local delta = cur-last
+		local delta = cur-last   
 		if delta>0.5 then
 			lastthink[ply] = cur 
 			local hp = ply:Health()
@@ -405,21 +207,21 @@ local function HOOK_PlayerPostThink( ply )
 		if ply._angraph and SERVER then
 			ply._angraph:Run()  
 		end
-	end  
+	end     
 end       
 local function HOOK_DoPlayerDeath( ply ) 
 	if SERVER and (ply.dotahero!=nil) then 
 		local de = ents.Create("prop_dynamic")
 		ply.death_ent = de
 		de.dotahero = ply.dotahero 
-		de:SetModel(ply:GetModel())
+		de:SetModel(ply:GetModel()) 
 		de:SetPos(ply:GetPos())
 		de:SetAngles(ply:GetAngles())
-		de:ResetSequence(ply:LookupSequence("death")) 
+		de:ResetSequence(ply:LookupSequence(table.Random(de.dotahero.death_anim or {"death"}))) 
 		//Dota.PlaySequence2(de, "death") 
-		return true
-	end
-end 
+		return true 
+	end 
+end  
 
 local function HOOK_CalcMainActivity( ply, vel ) 
 	if(ply.dotahero!=nil and not ply.dotahero.isplayermodel) then
@@ -440,7 +242,7 @@ local function HOOK_CalcMainActivity( ply, vel )
 		end
 		if true then   
 		return 0,result end  
-	end
+	end  
 end 
 local function HOOK_UpdateAnimation( ply, vel )
 	if(ply.dotahero!=nil and not ply.dotahero.isplayermodel) then 
@@ -459,11 +261,11 @@ local function HOOK_SetupMove( ply, mv, cmd )
 			local mount = ply.mount
 			if mount != nil and mount != NULL then
 				local speedmul = 1 if mv:KeyDown(IN_SPEED) then speedmul = 2 end
-				
+				 
 				if mv:KeyDown( IN_FORWARD) then //mv:KeyDown( IN_FORWARD)
 					//MsgN(mv:GetForwardSpeed()*speedmul)
 					ply:SetNWFloat("c_speed",mv:GetForwardSpeed()*speedmul)
-				else
+				else 
 					ply:SetNWFloat("c_speed",0)
 				end 
 				ply:SetNWAngle("c_vang",mv:GetMoveAngles())
@@ -472,14 +274,14 @@ local function HOOK_SetupMove( ply, mv, cmd )
 			end
 			if mv:KeyPressed(IN_USE) then
 				Dota.Dismount(ply)
-			end
+			end 
 		end
 		if ply.dotahero.move_allow_forward45 and mv:KeyDown( IN_FORWARD) then
 			ply:SetPoseParameter("body_yaw", ply:GetVelocity():Dot(-ply:GetRight()))
 		else
 			ply:SetPoseParameter("body_yaw",0)
 			mv:SetSideSpeed( 0 )
-		end
+		end 
 		mv:SetUpSpeed( 0 )
 		if false and controller != nil and controller !=NULL then 
 			local spd = math.max(0, controller:GetNWFloat("c_speed"))
@@ -510,10 +312,7 @@ local function HOOK_SetupMove( ply, mv, cmd )
 				end
 			end
 		end
-		 
-		//if  math.Rand( 1,10000 ) > 9990 then
-		//	mv:SetButtons( IN_JUMP)
-		//end
+		  
 		 
 		local isCasting = false //ply.dh_seqid!=ply.dotahero.a_cast 
 		local isRunning = mv:KeyDown(IN_SPEED)
@@ -527,8 +326,8 @@ local function HOOK_SetupMove( ply, mv, cmd )
 			firstrun = true   
 		end  
 		ply.dh_prevrun = mv:KeyDown( IN_FORWARD)
-		   
-		//if mv:KeyDown( IN_FORWARD) and not isCasting then 
+		    
+		//if mv:KeyDown( IN_FORWARD) and not isCasting then  
 		//	if mv:KeyDown(IN_SPEED) then   
 		//		Dota.PlaySequence2(ply, "run",firstrun)  
 		//	else
@@ -536,21 +335,8 @@ local function HOOK_SetupMove( ply, mv, cmd )
 		//	end 
 		//else  
 		//	Dota.PlaySequence2(ply, "idle")  
-		//end                        
-		if not isInVehicle then
-			//if mv:KeyDown( IN_DUCK) then
-			//	local kh_d = ply.dotahero.keyhook[IN_DUCK]
-			//	if kh_d then Dota.Cast(ply, kh_d) end
-			//elseif mv:KeyDown( IN_JUMP) then   
-			//	local kh_d = ply.dotahero.keyhook[IN_JUMP]
-			//	if kh_d then Dota.Cast(ply, kh_d) end
-			//elseif mv:KeyDown( IN_ATTACK) then 
-			//	local kh_d = ply.dotahero.keyhook[IN_ATTACK]
-			//	if kh_d then Dota.Cast(ply, kh_d)  end  
-			//elseif mv:KeyDown( IN_ATTACK2) then 
-			//	local kh_d = ply.dotahero.keyhook[IN_ATTACK2]
-			//	if kh_d then Dota.Cast(ply, kh_d)   end
-			//end 
+		//end                                
+		if not isInVehicle then    
 		end  
 		if ply.dh_animtime != nil and ply.dh_animtime < CurTime() then
 			Dota.PlaySequence2(ply, "idle")
@@ -559,7 +345,7 @@ local function HOOK_SetupMove( ply, mv, cmd )
 		end 
 		mv:RemoveKeys( IN_JUMP  )
 	end  
-end 
+end    
 local function HOOK_FindUseEntity(  ply,  defaultEnt )	 
 	local pp = ply:GetEyeTrace()
 	local ent = pp.Entity
@@ -570,7 +356,7 @@ local function HOOK_FindUseEntity(  ply,  defaultEnt )
 		end 
 	end 
 	    
-end     
+end      
        
 function UTILS_IsKeysPressed(ray,buttonray) 
 	if ray.IsPlayer then
@@ -579,36 +365,36 @@ function UTILS_IsKeysPressed(ray,buttonray)
 	if istable(buttonray) then
 		for k,v in pairs(buttonray) do
 			if ray[v] != true then return false end
-		end
+		end 
 	elseif isnumber(buttonray) then
-		return ray[buttonray] == true
+		return ray[buttonray] == true 
 	end 
-	return true 
-end       
+	return true  
+end        
 local function HOOK_PlayerButtonDown(  ply,  button  ) 
 	if SERVER and ply.dotahero then
 		ply.keyspressed = ply.keyspressed or {}
 		ply.keyspressed[button] = true 
 		
 		for k,v in pairs(ply.dotahero.keyhook) do
-			if isnumber(k) then
+			if isnumber(k) then 
 				if UTILS_IsKeysPressed(ply.keyspressed, {k}) then
 					Dota.Cast(ply, v)
 				end
 			elseif istable(k) then 
 				if UTILS_IsKeysPressed(ply.keyspressed, k) then
 					Dota.Cast(ply, v)
-				end
-			end
+				end 
+			end 
 		end
 		//local kh_d = ply.dotahero.keyhook[button]
 		//if kh_d then Dota.Cast(ply, kh_d) end
-	end 
-end   
+	end   
+end    
 local function HOOK_PlayerButtonUp(  ply,  button  ) 
 	if SERVER and ply.dotahero then
 		ply.keyspressed[button] = nil 
-	end
+	end  
 end 
 local function HOOK_KeyPress(  ply,  button  )
 	if SERVER and ply.dotahero then
@@ -632,6 +418,11 @@ hook.Add( "PlayerButtonDown", "DOTAHERO", HOOK_PlayerButtonDown )
 hook.Add( "PlayerButtonUp", "DOTAHERO", HOOK_PlayerButtonUp )
 hook.Add( "KeyPress", "DOTAHERO", HOOK_KeyPress )
 //hook.Add( "DoAnimationEvent", "DOTAHERO", HOOK_DoAnimationEvent )
- 
+  
+concommand.Add( "arena_setchar", function(ply,cmd,args)
+	local e = (oldEntity or Entity)(tonumber(args[1]))
+	if e then
+		character.Set(e,args[2])
+	end 
+end)  
     
-   

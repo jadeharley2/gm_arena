@@ -1,26 +1,29 @@
 AddCSLuaFile()
 
-ability.type = "self" 
-ability.cooldownDelay = 15
-ability.dispellDelay = 12 
+ability.type = "self"  
+ability.cooldownDelay = 2
+ability.range = 500
+ability.effect = "ignite"
 
 function ability:Begin(ply, trace) 
-	if ply:Alive() then 
-		ply.wfrenzy = true
-		ply.wfrenzypos = ply:GetPos()
-		//Dota.PlaySequence2(ply, "casts2")
+	if ply:Alive() then  
 		if SERVER then 
-			DoForAll("kindredClientPJTex("..tostring(ply:EntIndex())..")")
+			DoForAll("kindredClientPJTex22("..tostring(ply:EntIndex())..")")
+			for k,v in pairs(player.GetAll()) do 
+				if  v != ply and v:GetPos():Distance(ply:GetPos())<self.range then 
+					local meffect = MagicEffect(self.effect)
+					meffect.amount = 100
+					meffect.owner = ply.owner
+					local result = meffect:Cast(v) 
+				end 
+			end
 		end
 		return true
 	end
 end
-function ability:End(ply, trace) 
-	ply.wfrenzy = false
-end
-  
-local pjtc = 0
-function kindredClientPJTex(eid)
+
+  local pjtc = 0
+function kindredClientPJTex22(eid)
 	if pjtc and pjtc != 0 then
 		pjtc:Remove()
 	end
@@ -29,7 +32,7 @@ function kindredClientPJTex(eid)
 	pjtc:SetPos(e:GetPos()+Vector(0,0,150))
 	pjtc:SetAngles(Angle(90,0,0))
 	pjtc:SetBrightness( 10 )
-	pjtc:SetColor( Color(100,-100,100,200) )
+	pjtc:SetColor( Color(200,10,10,200) )
 	pjtc:SetTexture( "effects/flashlight/hard" )
 	pjtc:SetEnableShadows( false )
 	pjtc:SetFOV( 150 )
