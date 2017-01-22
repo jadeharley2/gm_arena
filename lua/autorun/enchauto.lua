@@ -365,17 +365,17 @@ function UTILS_IsKeysPressed(ray,buttonray)
 	if istable(buttonray) then
 		for k,v in pairs(buttonray) do
 			if ray[v] != true then return false end
-		end 
+		end   
 	elseif isnumber(buttonray) then
 		return ray[buttonray] == true 
-	end 
+	end   
 	return true  
-end        
+end           
 local function HOOK_PlayerButtonDown(  ply,  button  ) 
 	if SERVER and ply.dotahero then
 		ply.keyspressed = ply.keyspressed or {}
 		ply.keyspressed[button] = true 
-		
+		 
 		for k,v in pairs(ply.dotahero.keyhook) do
 			if isnumber(k) then 
 				if UTILS_IsKeysPressed(ply.keyspressed, {k}) then
@@ -389,18 +389,18 @@ local function HOOK_PlayerButtonDown(  ply,  button  )
 		end 
 		//local kh_d = ply.dotahero.keyhook[button]
 		//if kh_d then Dota.Cast(ply, kh_d) end
-	end   
+	end     
 end    
 local function HOOK_PlayerButtonUp(  ply,  button  ) 
 	if SERVER and ply.dotahero then
 		ply.keyspressed[button] = nil  
-	end    
+	end     
 end 
 local function HOOK_KeyPress(  ply,  button  )
 	if SERVER and ply.dotahero then
 		local kh_d = ply.dotahero.inkeyhook[button]
 		if kh_d then Dota.Cast(ply, kh_d) end
-	end 
+	end  
 end
 hook.Add( "SetupMove", "DOTAHERO",  HOOK_SetupMove)
 hook.Add( "PlayerLoadout", "DOTAHERO",HOOK_PlayerLoadout )

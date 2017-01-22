@@ -88,6 +88,15 @@ end
 function BGACT.PANIMRND(ent,animtbl,reset) 
 	return BGACT.PANIM(ent,table.Random(animtbl),reset)
 end
+function BGACT.PANIMCYCLE(ent,animtbl,reset,container,varname) 
+	local cid = container[varname] or 1
+	if cid < #animtbl then
+		container[varname] = cid + 1
+	else
+		container[varname] = 1
+	end
+	return BGACT.PANIM(ent,animtbl[cid],reset)
+end
 function BGUTIL.KPRESS(e,key) 
 	return UTILS_IsKeysPressed(e,key)
 end 

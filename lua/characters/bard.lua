@@ -34,7 +34,7 @@ function character:Behavior(ply,b)
 	b:NewState("run",function(s,e) BGACT.SETSPD(e,280) BGACT.PANIM(e,"floatrun") return 0.05 end) 
 	
 	b:NewState("attack",function(s,e) BGACT.ABCAST(e,"l_attack_ranged") return  
-		BGACT.PANIMRND(e, {"attack1","attack2","attack3"},true) end)
+		BGACT.PANIMCYCLE(e, {"attack1","attack2","attack3"},true,b,"att_cycle") end)
 	
 	b:NewState("recall",function(s,e) return BGACT.PANIM(e,"recall") end) 
 	b:NewState("recall_end",function(s,e) e:SetPos(Vector(0,0,0)) return 0.05 end) 
