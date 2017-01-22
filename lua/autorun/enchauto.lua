@@ -95,7 +95,7 @@ function StartEffects( ent , ineffect)
 	"for k=0,20 do \n"..
 	"	ps:AddControlPoint(k, ent, PATTACH_ABSORIGIN_FOLLOW, 0,Vector(0,0,0) )\n"..
 	"end \n"
-	for k,v in pairs(player.oldGetAll()) do
+	for k,v in pairs(player.GetAll()) do
 		v:SendLua(req)
 	end
 end
@@ -137,7 +137,7 @@ end
 
 function Util_ParticleEffect(ent, id, effect)
 	if SERVER then
-		for k,v in pairs(player.oldGetAll()) do
+		for k,v in pairs(player.GetAll()) do
 			v:SendLua("Util_ParticleEffect(Entity("..ent:EntIndex().."),\""..id.."\",\""..effect.."\")")
 		end
 	else
@@ -148,7 +148,7 @@ function Util_ParticleEffect(ent, id, effect)
 end
 function Util_StopEffect(ent,id)
 	if SERVER then
-		for k,v in pairs(player.oldGetAll()) do
+		for k,v in pairs(player.GetAll()) do
 			v:SendLua("Util_StopEffect(Entity("..ent:EntIndex().."),\""..id.."\")")
 		end
 	else
@@ -420,7 +420,7 @@ hook.Add( "KeyPress", "DOTAHERO", HOOK_KeyPress )
 //hook.Add( "DoAnimationEvent", "DOTAHERO", HOOK_DoAnimationEvent )
    
 concommand.Add( "arena_setchar", function(ply,cmd,args)
-	local e = (oldEntity or Entity)(tonumber(args[1]))
+	local e = (Entity or Entity)(tonumber(args[1]))
 	if e then
 		character.Set(e,args[2])
 	end 

@@ -113,9 +113,9 @@ function character.Set(ent,name)
 			local eid = ent:EntIndex()
 			InitCharacter(ent)
 			if SERVER then
-				MsgN("character.Set(oldEntity("..tostring(eid).."),'"..name.."')")
-				for k,v in pairs(player.oldGetAll()) do 
-					v:SendLua("character.Set(oldEntity("..tostring(eid).."),'"..name.."')")
+				MsgN("character.Set(Entity("..tostring(eid).."),'"..name.."')")
+				for k,v in pairs(player.GetAll()) do 
+					v:SendLua("character.Set(Entity("..tostring(eid).."),'"..name.."')")
 				end
 			end
 		else 
@@ -125,7 +125,7 @@ function character.Set(ent,name)
 		UnInitCharacter(ent)
 		local eid = ent:EntIndex()
 		if SERVER then
-			for k,v in pairs(player.oldGetAll()) do 
+			for k,v in pairs(player.GetAll()) do 
 				v:SendLua("character.Set(Entity("..tostring(eid).."))")
 			end
 		end 
