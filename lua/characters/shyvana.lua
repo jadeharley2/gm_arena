@@ -21,7 +21,7 @@ character.speed_run = 280
 function character:Behavior(ply,b)
 	//b.debug = true
 	b:NewState("spawn",function(s,e) BGACT.SETSPD(e,0) return 0.05 end)
-	b:NewState("idle",function(s,e) BGACT.SETSPD(e,0) return 0.05 end) 
+	b:NewState("idle",function(s,e) BGACT.SETSPD(e,0) return BGACT.PANIM(e,"idle1") end) 
 	b:NewState("idle_rnd",function(s,e) BGACT.SETSPD(e,0)  return BGACT.PANIMRND(e,{"idle1","idle2","idle3","idle4"}) end) 
 	b:NewState("run",function(s,e) BGACT.SETSPD(e,280) BGACT.PANIM(e,"run") return 0.05 end) 
 	b:NewState("attack",function(s,e) BGACT.ABCAST(e,"l_attack_melee") return  
@@ -32,9 +32,12 @@ function character:Behavior(ply,b)
 	
 	b:NewState("social_root",function(s,e) return 0.1 end)
 	b:NewState("social_dance",function(s,e) BGACT.PANIM(e,"dance") return 0.05 end) 
+	b:NewState("social_joke",function(s,e) return BGACT.PANIM(e,"joke") end) 
+	b:NewState("social_laugh",function(s,e) return BGACT.PANIM(e,"laugh") end) 
+	b:NewState("social_taunt",function(s,e) return BGACT.PANIM(e,"taunt") end) 
 	
 	
-	b:NewGroup("g_social",{"social_dance"}) 
+	b:NewGroup("g_social",{"social_dance","social_joke","social_laugh","social_taunt"}) 
 	b:NewGroup("g_stand_nosocial",{"spawn","idle","idle_rnd","recall"}) 
 	b:NewGroup("g_stand_norecall",{"spawn","idle","idle_rnd","g_social"})
 	b:NewGroup("g_stand",{"spawn","idle","idle_rnd","recall","g_social"})
@@ -54,8 +57,11 @@ function character:Behavior(ply,b)
 	b:NewTransition("recall_end","spawn",BGCOND.ANMFIN)
 	
 	b:NewTransition("g_stand_nosocial","social_root",function(s,e) return BGUTIL.KPRESS(e,KEY_LCONTROL) 
-		and ( BGUTIL.KPRESS(e,KEY_3) or BGUTIL.KPRESS(e,KEY_4))  end) 
+		and ( BGUTIL.KPRESS(e,KEY_1) or BGUTIL.KPRESS(e,KEY_2) or BGUTIL.KPRESS(e,KEY_3) or BGUTIL.KPRESS(e,KEY_4))  end) 
+	b:NewTransition("social_root","social_joke",function(s,e) return BGUTIL.KPRESS(e,KEY_1) end)  
+	b:NewTransition("social_root","social_laugh",function(s,e) return BGUTIL.KPRESS(e,KEY_2) end)  
 	b:NewTransition("social_root","social_dance",function(s,e) return BGUTIL.KPRESS(e,KEY_3) end)  
+	b:NewTransition("social_root","social_taunt",function(s,e) return BGUTIL.KPRESS(e,KEY_3) end)  
 	
 	
 	

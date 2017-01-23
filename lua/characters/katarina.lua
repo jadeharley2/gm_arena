@@ -69,13 +69,14 @@ function character:Behavior(ply,b)
 	b:NewGroup("g_stand_nosocial",{"spawn","idle","idle_rnd","recall","attack"}) 
 	b:NewGroup("g_stand_norecall",{"spawn","idle","idle_rnd","g_social","attack"})
 	b:NewGroup("g_stand",{"spawn","idle","idle_rnd","recall","g_social","attack"})
+	b:NewGroup("g_run",{"run","runspecial"})
 	
 	b:NewTransition("spawn","idle",BGCOND.ANMFIN) 
 	b:NewTransition("idle","idle_rnd",BGCOND.ANMFIN) 
 	b:NewTransition("idle_rnd","idle",BGCOND.ANMFIN) 
 	
 	b:NewTransition("g_stand","run",function(s,e) return e:KeyDown(IN_FORWARD) end)  
-	b:NewTransition("run","idle",function(s,e) return !e:KeyDown(IN_FORWARD) end)
+	b:NewTransition("g_run","idle",function(s,e) return !e:KeyDown(IN_FORWARD) end)
 	b:NewTransition("run","runspecial",BGCOND.RND01P)
 	b:NewTransition("runspecial","idle",BGCOND.ANMFIN) 
 			

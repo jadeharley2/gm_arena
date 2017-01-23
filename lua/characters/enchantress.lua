@@ -190,7 +190,7 @@ character.ab_basicattack = {
 31	=	head_rot_y 
 */
 function character:Behavior(ply,asn)
-	asn.debug = true
+	//asn.debug = true
 	asn:NewState("spawn",function(s,e) BGACT.SETSPD(e,0) return BGACT.PANIM(e,"spawn")  end) 
 	asn:NewState("idle",function(s,e) BGACT.SETSPD(e,0) BGACT.PANIM(e,"idle") return 0.05 end) 
 	asn:NewState("idlespecial", function(s,e) return BGACT.PANIM(e,"idle_alt") end) 
