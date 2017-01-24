@@ -385,27 +385,27 @@ local function HOOK_PlayerButtonDown(  ply,  button  )
 				if UTILS_IsKeysPressed(ply.keyspressed, k) then
 					Dota.Cast(ply, v) 
 				end   
-			end 
-		end 
+			end  
+		end  
 		//local kh_d = ply.dotahero.keyhook[button]
 		//if kh_d then Dota.Cast(ply, kh_d) end
 	end     
-end    
+end     
 local function HOOK_PlayerButtonUp(  ply,  button  ) 
 	if SERVER and ply.dotahero then
 		ply.keyspressed[button] = nil  
-	end      
-end 
+	end        
+end   
 local function HOOK_KeyPress(  ply,  button  )
 	if SERVER and ply.dotahero then
 		local kh_d = ply.dotahero.inkeyhook[button]
 		if kh_d then Dota.Cast(ply, kh_d) end
-	end   
-end
+	end     
+end    
 hook.Add( "SetupMove", "DOTAHERO",  HOOK_SetupMove)
 hook.Add( "PlayerLoadout", "DOTAHERO",HOOK_PlayerLoadout )
 hook.Add( "TranslateActivity", "DOTAHERO", HOOK_TranslateActivity)
-hook.Add( "PlayerSetModel", "DOTAHERO", HOOK_PlayerSetModel)
+hook.Add( "PlayerSetModel", "DOTAHERO", HOOK_PlayerSetModel) 
 hook.Add( "PlayerSpawn", "DOTAHERO", HOOK_PlayerSpawn)
 hook.Add( "CalcMainActivity", "DOTAHERO", HOOK_CalcMainActivity)
 hook.Add( "UpdateAnimation", "DOTAHERO", HOOK_UpdateAnimation )
@@ -421,17 +421,17 @@ hook.Add( "KeyPress", "DOTAHERO", HOOK_KeyPress )
      
 concommand.Add( "arena_setchar", function(ply,cmd,args)
 	local e = (Entity or Entity)(tonumber(args[1]))
-	if e then
+	if e then  
 		character.Set(e,args[2]) 
-	end 
+	end  
 end)  
-
-
+ 
 
 
 
 
  
+  
 
 
 

@@ -63,6 +63,9 @@ function character.UpdateLevel(ent,level)
 		if abr then
 			abr.cooldownDelay = ent.stats.attackspeed 
 		end
+		if SERVER then
+			DoForAll("character.UpdateLevel(Entity("..tostring(ent:EntIndex()).."),"..tostring(level)..")");
+		end
 	end
 end
 local function InitCharacter(ent)
@@ -75,7 +78,9 @@ local function InitCharacter(ent)
 	for k,v in pairs(hero.spells) do 
 		local name = v[1]
 		local ab = Ability(name)
+		table.Merge(ab,v)
 		ab.owner = ent
+		ab.nextcast = CurTime()+ab.cooldownDelay
 		ent.abilities[name] = ab 
 	end
 	character.UpdateLevel(ent,1) 

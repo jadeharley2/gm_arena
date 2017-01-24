@@ -4,7 +4,8 @@ character.name = "shyvana"
 character.model = "models/heroes/shyvana/dragon.mdl"
 character.move_allow_forward45 = true   
 character.spells = { 
-	{"l_attack_melee"},    
+	{"l_attack_melee"},     
+	{"shyvana_transform", form = "shyvana"}
 }
 character.stats = {
 	//{base,perLevel}
@@ -29,6 +30,11 @@ function character:Behavior(ply,b)
 			function(s,e) e:StopSound( "league_misc.recall" )end) 
 	b:NewState("recall_end",function(s,e) e:SetPos(Vector(0,0,0)) return 0.05 end) 
 	
+	b:NewState("transform",function(s,e) BGACT.SETSPD(e,0) BGACT.PANIM(e,"spell4") return 2 end)
+	b:NewState("transform_land",function(s,e) return BGACT.PANIM(e,"spell4_land") end)
+	
+	b:NewState("spell4",function(s,e)  BGACT.ABCAST(e,"shyvana_transform") return 0.05 end) 
+	
 	b:NewState("social_root",function(s,e) return 0.1 end)
 	b:NewState("social_laugh",function(s,e) return  BGACT.PANIM(e,"laugh") end) 
 	b:NewState("social_taunt",function(s,e) return  BGACT.PANIM(e,"taunt") end) 
@@ -47,6 +53,8 @@ function character:Behavior(ply,b)
 	b:NewTransition("g_stand","attack",function(s,e) return e:KeyDown(IN_ATTACK) and BGUTIL.ABREADY(e,"l_attack_melee") end) 
 	b:NewTransition("attack","idle",BGCOND.ANMFIN) 
 	
+	b:NewTransition("g_stand","spell4",function(s,e) return BGUTIL.KPRESS(e,KEY_F)  and BGUTIL.ABREADY(e,"shyvana_transform") end) 
+	
 	b:NewTransition("g_stand_norecall","recall",function(s,e) return BGUTIL.KPRESS(e,KEY_B) end) 
 	b:NewTransition("recall","recall_end",BGCOND.ANMFIN)
 	b:NewTransition("recall_end","spawn",BGCOND.ANMFIN)
@@ -56,7 +64,10 @@ function character:Behavior(ply,b)
 	b:NewTransition("social_root","social_laugh",function(s,e) return BGUTIL.KPRESS(e,KEY_1) end)  
 	b:NewTransition("social_root","social_taunt",function(s,e) return BGUTIL.KPRESS(e,KEY_2) end)  
 	
+	b:NewTransition("g_social","idle",BGCOND.ANMFIN)  
 	
+	b:NewTransition("transform","transform_land",function(s,e) return e:OnGround() end)  
+	b:NewTransition("transform_land","idle",BGCOND.ANMFIN) 
 	
 	b:SetState("spawn")
 	

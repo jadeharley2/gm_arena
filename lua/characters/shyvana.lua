@@ -4,7 +4,8 @@ character.name = "shyvana"
 character.model = "models/heroes/shyvana/shyvana.mdl"
 character.move_allow_forward45 = true   
 character.spells = { 
-	{"l_attack_melee"},    
+	{"l_attack_melee"},   
+	{"shyvana_transform"}
 }
 character.stats = {
 	//{base,perLevel}
@@ -30,14 +31,23 @@ function character:Behavior(ply,b)
 			function(s,e) e:StopSound( "league_misc.recall" )end) 
 	b:NewState("recall_end",function(s,e) e:SetPos(Vector(0,0,0)) return 0.05 end) 
 	
+	b:NewState("spell4",function(s,e)   return BGACT.PANIM(e,"spell4") end) 
+	b:NewState("spell4_end",function(s,e)  
+		e:SetPos(e:GetPos()+Vector(0,0,2)) 
+		local ea = e:GetAngles() 
+		e:SetVelocity(ea:Forward()*1000+ea:Up()*500) 
+		BGACT.ABCAST(e,"shyvana_transform") 
+		return 0.05 
+	end) 
+	
 	b:NewState("social_root",function(s,e) return 0.1 end)
-	b:NewState("social_dance",function(s,e) BGACT.PANIM(e,"dance") return 0.05 end) 
+	b:NewState("social_dance",function(s,e) return BGACT.PANIM(e,"dance") end) 
 	b:NewState("social_joke",function(s,e) return BGACT.PANIM(e,"joke") end) 
 	b:NewState("social_laugh",function(s,e) return BGACT.PANIM(e,"laugh") end) 
 	b:NewState("social_taunt",function(s,e) return BGACT.PANIM(e,"taunt") end) 
 	
 	
-	b:NewGroup("g_social",{"social_dance","social_joke","social_laugh","social_taunt"}) 
+	b:NewGroup("g_social",{"social_dance","social_joke","social_laugh","social_taunt"})  
 	b:NewGroup("g_stand_nosocial",{"spawn","idle","idle_rnd","recall"}) 
 	b:NewGroup("g_stand_norecall",{"spawn","idle","idle_rnd","g_social"})
 	b:NewGroup("g_stand",{"spawn","idle","idle_rnd","recall","g_social"})
@@ -52,6 +62,9 @@ function character:Behavior(ply,b)
 	b:NewTransition("g_stand","attack",function(s,e) return e:KeyDown(IN_ATTACK) and BGUTIL.ABREADY(e,"l_attack_melee") end) 
 	b:NewTransition("attack","idle",BGCOND.ANMFIN) 
 	
+	b:NewTransition("g_stand","spell4",function(s,e) return BGUTIL.KPRESS(e,KEY_F)  and BGUTIL.ABREADY(e,"shyvana_transform") end) 
+	b:NewTransition("spell4","spell4_end",BGCOND.ANMFIN) 
+	
 	b:NewTransition("g_stand_norecall","recall",function(s,e) return BGUTIL.KPRESS(e,KEY_B) end) 
 	b:NewTransition("recall","recall_end",BGCOND.ANMFIN)
 	b:NewTransition("recall_end","spawn",BGCOND.ANMFIN)
@@ -61,7 +74,8 @@ function character:Behavior(ply,b)
 	b:NewTransition("social_root","social_joke",function(s,e) return BGUTIL.KPRESS(e,KEY_1) end)  
 	b:NewTransition("social_root","social_laugh",function(s,e) return BGUTIL.KPRESS(e,KEY_2) end)  
 	b:NewTransition("social_root","social_dance",function(s,e) return BGUTIL.KPRESS(e,KEY_3) end)  
-	b:NewTransition("social_root","social_taunt",function(s,e) return BGUTIL.KPRESS(e,KEY_3) end)  
+	b:NewTransition("social_root","social_taunt",function(s,e) return BGUTIL.KPRESS(e,KEY_4) end)  
+	b:NewTransition("g_social","idle",BGCOND.ANMFIN)
 	
 	
 	

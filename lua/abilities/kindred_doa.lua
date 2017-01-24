@@ -1,5 +1,5 @@
 AddCSLuaFile()
-
+ability.icon = "vgui/icons/spells/Kindred_Q.png"
 ability.type = "self"
 ability.animation = "attack"
 ability.cooldownDelay = 2

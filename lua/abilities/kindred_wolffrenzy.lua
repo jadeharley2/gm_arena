@@ -1,5 +1,6 @@
 AddCSLuaFile()
 
+ability.icon = "vgui/icons/spells/Kindred_W.png"
 ability.type = "self" 
 ability.cooldownDelay = 15
 ability.dispellDelay = 12 

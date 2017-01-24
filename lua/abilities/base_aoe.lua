@@ -1,5 +1,6 @@
 AddCSLuaFile()
 
+ability.icon = "vgui/icons/spells/Bard_R.png"
 ability.type = "self"  
 ability.cooldownDelay = 2
 ability.range = 500
