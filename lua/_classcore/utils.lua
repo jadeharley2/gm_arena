@@ -32,3 +32,11 @@ function UTILS_SafeCall(obj, func, ...)
 		return fl(obj,...)
 	end 
 end  
+
+function DoForAll(lua)
+	for k,v in pairs(player.GetAll()) do
+		if v.SendLua!=nil then
+			v:SendLua(lua)
+		end
+	end
+end
