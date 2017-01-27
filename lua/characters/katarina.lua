@@ -27,15 +27,67 @@ sound.Add( {
 	}
 } )
 
+sound.Add( {
+	name = "katarina.shunpo",
+	channel = CHAN_WEAPON,
+	volume = { 0.6, 0.8 },
+	level = 90,
+	pitch = { 90, 110 },
+	sound = {
+		"heroes/katarina/shunpo1.ogg",
+		"heroes/katarina/shunpo2.ogg",
+		"heroes/katarina/shunpo3.ogg",
+		"heroes/katarina/shunpo4.ogg",
+	}
+} )
+
+sound.Add( {
+	name = "katarina.dager",
+	channel = CHAN_WEAPON,
+	volume = { 0.6, 0.8 },
+	level = 90,
+	pitch = { 90, 110 },
+	sound = {
+		"heroes/katarina/dager1.ogg",
+		"heroes/katarina/dager2.ogg",
+		"heroes/katarina/dager3.ogg",
+		"heroes/katarina/dager4.ogg",
+	}
+} )
+
+sound.Add( {
+	name = "katarina.lotus",
+	channel = CHAN_WEAPON,
+	volume = { 0.6, 0.8 },
+	level = 90,
+	pitch = { 90, 110 },
+	sound = {
+		"heroes/katarina/lotus1.ogg",
+		"heroes/katarina/lotus2.ogg",
+		"heroes/katarina/lotus3.ogg",
+	}
+} )
+
+sound.Add( {
+	name = "katarina.taunt",
+	channel = CHAN_WEAPON,
+	volume = { 0.6, 0.8 },
+	level = 90,
+	pitch = { 90, 110 },
+	sound = {
+		"heroes/katarina/taunt.ogg",
+	}
+} )
+
 character.name = "katarina"
 character.model = "models/heroes/katarina/katarina.mdl"
 character.move_allow_forward45 = false
 character.spells = {
 	{"l_attack_melee"},
 	{"katarina_passive"},
-	{"katarina_dager", key = KEY_Q},
-	{"katarina_shunpo", key = KEY_E},
-	{"katarina_lotus", key = KEY_R}
+	{"katarina_dager"},
+	{"katarina_shunpo"},
+	{"katarina_lotus"}
 }
 character.stats = {
 	//{base,perLevel}
@@ -63,12 +115,14 @@ function character:Behavior(ply,b)
 	b:NewState("recall_end",function(s,e) e:SetPos(Vector(0,0,0)) return 0.05 end)
 
 	b:NewState("spell1",function(s,e) BGACT.ABCAST(e,"katarina_dager") return BGACT.PANIM(e,"spell1") end)
-	b:NewState("spell3",function(s,e) BGACT.ABCAST(e,"katarina_shunpo") return BGACT.PANIM(e,"spell3") end)
-	b:NewState("spell4",function(s,e) BGACT.ABCAST(e,"katarina_lotus") return BGACT.PANIM(e,"spell4") end)
+	b:NewState("spell3",function(s,e) BGACT.ABCAST(e,"katarina_shunpo")  e:SetCycle( 0) return BGACT.PANIM(e,"spell3") end)
+	b:NewState("spell4",function(s,e) return BGACT.PANIM(e,"spell4",true) end,
+	function(s,e,ns) if ns.name !="spell4"then e.abilities.katarina_lotus:Dispell() end end)
+	b:NewState("spell4_start",function(s,e) s.spell4_end = CurTime()+5 BGACT.ABCAST(e,"katarina_lotus") return 0.01 end)
 
 	b:NewState("social_root",function(s,e) return 0.1 end)
 	b:NewState("social_dance",function(s,e) return  BGACT.PANIM(e,"dance") end)
-	b:NewState("social_taunt",function(s,e) return  BGACT.PANIM(e,"taunt") end)
+	b:NewState("social_taunt",function(s,e) e:EmitSound("katarina.taunt") return  BGACT.PANIM(e,"taunt") end)
 	b:NewState("social_laugh",function(s,e) return  BGACT.PANIM(e,"laugh") end)
 	b:NewState("social_joke",function(s,e) return  BGACT.PANIM(e,"joke") end)
 
@@ -78,7 +132,7 @@ function character:Behavior(ply,b)
 	b:NewGroup("g_stand_norecall",{"spawn","idle","idle_rnd","g_social","attack"})
 	b:NewGroup("g_stand",{"spawn","idle","idle_rnd","recall","g_social","attack","g_cast_interruptable"})
 	b:NewGroup("g_run",{"run","runspecial"})
-	b:NewGroup("g_cast",{"spell1","spell3","spell4"})
+	b:NewGroup("g_cast",{"spell1","spell3"})
 
 	b:NewTransition("spawn","idle",BGCOND.ANMFIN)
 	b:NewTransition("idle","idle_rnd",BGCOND.ANMFIN)
@@ -108,7 +162,11 @@ function character:Behavior(ply,b)
 	//Spells
 	b:NewTransition("g_stand","spell1",function(s,e) return BGUTIL.KPRESS(e,KEY_Q) and BGUTIL.ABREADY(e,"katarina_dager") end)
 	b:NewTransition("g_stand","spell3",function(s,e) return BGUTIL.KPRESS(e,KEY_E) and BGUTIL.ABREADY(e,"katarina_shunpo") end)
-	b:NewTransition("g_stand","spell4",function(s,e) return BGUTIL.KPRESS(e,KEY_R) and BGUTIL.ABREADY(e,"katarina_lotus") end)
+	b:NewTransition("g_stand","spell4_start",function(s,e) return BGUTIL.KPRESS(e,KEY_R) and BGUTIL.ABREADY(e,"katarina_lotus") end)
+
+	b:NewTransition("spell4_start","spell4",BGCOND.ANMFIN)
+  b:NewTransition("spell4","spell4",BGCOND.ANMFIN)
+  b:NewTransition("spell4","idle", function(s,e)  return s.spell4_end<CurTime() end)
 
 	b:NewTransition("g_cast","idle",BGCOND.ANMFIN)
 
