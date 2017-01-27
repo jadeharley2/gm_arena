@@ -17,24 +17,26 @@ local function nReceive( len, pl )
 	if etype == 1 then //anim
 		local sequence = net.ReadInt(32)
 		local reset = net.ReadBool()
-		if CLIENT then
-			if ent.dh_seqid != sequence then 
+		local seqstart = net.ReadFloat()
+		if CLIENT then 
+			ent.dh_seqstart = seqstart
+			if ent.dh_seqid != sequence then   
 				ent.dh_seqreset = true
 			else
 				ent.dh_seqreset = reset
 			end
 			ent.dh_seqid = sequence 
 		else
-			ent.dh_seqreset = ent.dh_seqid != sequence
-			ent.dh_seqid = sequence 
-			
-			net.Start("dota_hero_event")
-			net.WriteInt(etype,32)
-			net.WriteEntity(ent)
-			net.WriteInt(sequence,32)
-			net.WriteBool(reset)
-			net.Broadcast()
-			
+			//ent.dh_seqreset = ent.dh_seqid != sequence
+			//ent.dh_seqid = sequence 
+			//
+			//net.Start("dota_hero_event")
+			//net.WriteInt(etype,32)
+			//net.WriteEntity(ent)
+			//net.WriteInt(sequence,32)
+			//net.WriteBool(reset)
+			//net.Broadcast()
+			//
 		end
 	elseif etype == 2 then // effect
 		if SERVER then
@@ -211,37 +213,38 @@ local function HOOK_PlayerPostThink( ply )
 end       
 local function HOOK_DoPlayerDeath( ply ) 
 	if SERVER and (ply.dotahero!=nil) then 
-		local de = ents.Create("prop_dynamic")
+		local de = ents.Create("prop_dynamic") 
 		ply.death_ent = de
 		de.dotahero = ply.dotahero 
 		de:SetModel(ply:GetModel()) 
 		de:SetPos(ply:GetPos())
 		de:SetAngles(ply:GetAngles())
-		de:ResetSequence(ply:LookupSequence(table.Random(de.dotahero.death_anim or {"death"}))) 
+		de:ResetSequence(ply:LookupSequence(table.Random(de.dotahero.death_anim or {"death"})))   
 		//Dota.PlaySequence2(de, "death") 
 		return true 
-	end 
+	end  
 end  
 
 local function HOOK_CalcMainActivity( ply, vel ) 
 	if(ply.dotahero!=nil and not ply.dotahero.isplayermodel) then
 		local hero = ply.dotahero 
 		local result = 1
-		
-		local ct = CurTime()
+		 
+		local ct = CurTime() 
 		local curact = ply.dh_seqid or -1
-		local reset = ply.dh_seqreset or false 
+		local reset = ply.dh_seqreset or false  
 		local timestamp = ply.dh_seqts or -1
 		local cts = ply:GetCycle()
-		if curact != -1 then
-			if reset then 
-				ply.dh_seqreset = false
-				ply:SetCycle(0)
-			end 
-			result = curact 
-		end
+		if curact != -1 then 
+			if reset then  
+				ply.dh_seqreset = false   
+				ply:SetCycle(ply.dh_seqstart or 0) 
+				ply.dh_seqstart = 0
+			end   
+			result = curact   
+		end 
 		if true then   
-		return 0,result end  
+		return 0,result end   
 	end  
 end 
 local function HOOK_UpdateAnimation( ply, vel )
@@ -307,8 +310,7 @@ local function HOOK_SetupMove( ply, mv, cmd )
 					ply._anim_attack = 1
 				end
 				if(	ply._anim_cast!=1 and mv:KeyPressed( IN_JUMP)   ) then  
-					ply._anim_cast = 1
-					MsgN("CAST")
+					ply._anim_cast = 1 
 				end
 			end
 		end
@@ -360,14 +362,14 @@ end
        
 function UTILS_IsKeysPressed(ray,buttonray) 
 	if ray.IsPlayer then
-		ray = ray.keyspressed or {}
-	end
+		ray = ray.keyspressed or {} 
+	end   
 	if istable(buttonray) then
 		for k,v in pairs(buttonray) do
 			if ray[v] != true then return false end
 		end   
 	elseif isnumber(buttonray) then
-		return ray[buttonray] == true 
+		return ray[buttonray] == true  
 	end   
 	return true  
 end           
@@ -383,17 +385,17 @@ local function HOOK_PlayerButtonDown(  ply,  button  )
 				end
 			elseif istable(k) then 
 				if UTILS_IsKeysPressed(ply.keyspressed, k) then
-					Dota.Cast(ply, v) 
+					Dota.Cast(ply, v)  
 				end   
 			end  
-		end  
+		end   
 		//local kh_d = ply.dotahero.keyhook[button]
 		//if kh_d then Dota.Cast(ply, kh_d) end
 	end     
 end     
-local function HOOK_PlayerButtonUp(  ply,  button  ) 
+local function HOOK_PlayerButtonUp(  ply,  button  )  
 	if SERVER and ply.dotahero then
-		ply.keyspressed[button] = nil  
+		ply.keyspressed[button] = nil      
 	end        
 end   
 local function HOOK_KeyPress(  ply,  button  )
@@ -401,7 +403,7 @@ local function HOOK_KeyPress(  ply,  button  )
 		local kh_d = ply.dotahero.inkeyhook[button]
 		if kh_d then Dota.Cast(ply, kh_d) end
 	end     
-end    
+end     
 hook.Add( "SetupMove", "DOTAHERO",  HOOK_SetupMove)
 hook.Add( "PlayerLoadout", "DOTAHERO",HOOK_PlayerLoadout )
 hook.Add( "TranslateActivity", "DOTAHERO", HOOK_TranslateActivity)

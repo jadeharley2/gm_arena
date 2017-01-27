@@ -2,7 +2,7 @@ AddCSLuaFile()
 
 ability.base = "base_target"  
 ability.cooldownDelay = 0.5
-ability.effect = "l_hurt" 
+ability.effect = "l_hurt"  
 
   
 function ability:Begin(ply, trace)  
