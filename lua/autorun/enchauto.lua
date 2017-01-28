@@ -44,7 +44,7 @@ local function nReceive( len, pl )
 			local target = net.ReadEntity()
 			MagicEffect(effectname):Cast(target)
 		end
-	end
+	end        
 end 
 
 net.Receive( "dota_hero_event", nReceive)
@@ -62,7 +62,7 @@ function Dota.Cast(ply, name)//SERVER
 	return false
 end 
 
-local CMoveData = FindMetaTable( "CMoveData" )
+local CMoveData = FindMetaTable( "CMoveData" )  
 function CMoveData:RemoveKeys( keys ) 
 	local newbuttons = bit.band( self:GetButtons(), bit.bnot( keys ) )
 	self:SetButtons( newbuttons )
