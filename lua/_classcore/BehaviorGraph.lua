@@ -44,23 +44,27 @@ end
 function BehaviorGraphMeta:SetState(name)  
 	local ent = self._ent
 	local from = self._cstate
-	local to = self.states[name]  
-	if self._cstate then
-		if self._cstate.exit then
-			self._cstate.exit(self,ent,to) 
+	local to = self.states[name] 
+	if to then
+		if self._cstate then
+			if self._cstate.exit then
+				self._cstate.exit(self,ent,to) 
+			end
 		end
-	end
-	if self._cstate then
-		from = self._cstate 
-		if self.debug then MsgN("changing state: ",from.name," => ",to.name) end
+		if self._cstate then
+			from = self._cstate 
+			if self.debug then MsgN("changing state: ",from.name," => ",to.name) end
+		else
+			if self.debug then MsgN("starting graph with state: ",to.name) end
+		end 
+		self._cstate = to
+		if self._cstate.enter then 
+			self.anim_end = CurTime() + ( self._cstate.enter(self,ent,from) or 0.5 )
+		else
+			self.anim_end = CurTime()
+		end
 	else
-		if self.debug then MsgN("starting graph with state: ",to.name) end
-	end 
-	self._cstate = to
-	if self._cstate.enter then 
-		self.anim_end = CurTime() + ( self._cstate.enter(self,ent,from) or 0.5 )
-	else
-		self.anim_end = CurTime()
+		ErrorNoHalt("Unknown state: "..name)
 	end
 end
 	     

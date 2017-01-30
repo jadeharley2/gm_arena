@@ -10,7 +10,7 @@ function Ability(baseeffect)
 		if b then
 			m = table.Copy(b)
 		else
-			MsgN( "Magic effect "..baseeffect.." not found!\n" )
+			MsgN( "Ability "..baseeffect.." not found!\n" )
 			return nil
 		end
 	else

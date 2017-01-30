@@ -1,0 +1,17 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/heroes/nidalee/nidalee_cleopatra_2012_TX_CM" 
+	"$model" "1"    
+	"$phong" "1" 
+	/"$color2" "[1 1 1]" 
+	"$basemapalphaphongmask" "1"
+	"$phongexponent" "2"
+	"$phongboost" "0.02"
+	"$phongalbedotint" "1"
+	"$phongtint" "[1 .95 1.95]"
+	"$phongfresnelranges"	"[0.5 6 10]"
+	
+	$rimlight               1
+	$rimlightexponent       2
+	$rimlightboost          3
+}

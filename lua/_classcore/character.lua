@@ -95,15 +95,23 @@ local function InitCharacter(ent)
 		hero:Behavior(ent,bg)
 		ent._angraph = bg 
 	end  
+	if ent.dh_cskin then
+		character.SetSkin(ent,ent.dh_cskin) 
+	end
+	
 	if ent.dotahero.Spawn then ent.dotahero:Spawn(ent) end
+	
+	
 end
 local function UnInitCharacter(ent)
 	if ent.dotahero then
 		if ent.dotahero.Despawn then ent.dotahero:Despawn(ent) end
 		ent.dotahero = nil
+		ent.basehero = nil
 		ent._angraph = nil 
 		ent:SetModel("")
 		if ent.AllowFlashlight then ent:AllowFlashlight( true ) end
+		ent.dh_cskin = nil
 	end 
 end
 
@@ -136,7 +144,61 @@ function character.Set(ent,name)
 		end 
 	end  
 end
- 
+function character.Transform(ent,targetname) 
+	if ent.dotahero and targetname then 
+		if ent.basehero then
+			if ent.basehero.name == targetname then
+				local ctd = ent.dotahero 
+				ent.dotahero = ent.basehero
+				ent.basehero = ctd
+				local eid = ent:EntIndex()
+				InitCharacter(ent)
+				if SERVER then
+					MsgN("character.Transform(Entity("..tostring(eid).."),'"..targetname.."')")
+					for k,v in pairs(player.GetAll()) do 
+						v:SendLua("character.Transform(Entity("..tostring(eid).."),'"..targetname.."')")
+					end
+				end
+				return nil 
+			end
+		else 
+			local char  = Character(targetname)
+			//MsgN(char)
+			//PrintTable(char)
+			if char then 
+				ent.basehero = ent.dotahero
+				ent.dotahero = char
+				local eid = ent:EntIndex()
+				InitCharacter(ent)
+				if SERVER then
+					MsgN("character.Transform(Entity("..tostring(eid).."),'"..targetname.."')")
+					for k,v in pairs(player.GetAll()) do 
+						v:SendLua("character.Transform(Entity("..tostring(eid).."),'"..targetname.."')")
+					end
+				end
+			else 
+				MsgN("character "..name.." not found")
+			end
+		end
+		
+	end
+end
+
+function character.SetSkin(ent,id)
+	if ent.dotahero then
+		if ent.dotahero.skins then
+			local sk  = ent.dotahero.skins[id]
+			// { bg = {1,0}, skn = 0},
+			if sk then
+				if (sk.bg) then ent:SetBodygroup(sk.bg[1],sk.bg[2]) end
+				if (sk.skn) then ent:SetSkin(sk.skn) end
+				ent.dh_cskin = id
+				return true
+			end 
+		end
+	end
+	return false
+end
 
 CHR.__index = CHR 
  

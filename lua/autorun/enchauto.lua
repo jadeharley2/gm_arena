@@ -1,12 +1,12 @@
 AddCSLuaFile()
   
   
-include("_classcore/init.lua")
+include("_classcore/init.lua")    
   
- 
+   
  
 Dota = Dota or {}
- 
+    
  
 if SERVER then
 	util.AddNetworkString( "dota_hero_event" )
@@ -17,11 +17,11 @@ local function nReceive( len, pl )
 	if etype == 1 then //anim
 		local sequence = net.ReadInt(32)
 		local reset = net.ReadBool()
-		local seqstart = net.ReadFloat()
+		local seqstart = net.ReadFloat()    
 		if CLIENT then 
 			ent.dh_seqstart = seqstart
 			if ent.dh_seqid != sequence then   
-				ent.dh_seqreset = true
+				ent.dh_seqreset = true 
 			else
 				ent.dh_seqreset = reset
 			end
