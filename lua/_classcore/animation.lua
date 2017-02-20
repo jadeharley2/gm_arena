@@ -81,6 +81,8 @@ function BGCOND.RND01P() return math.random(1,10000)<10 end
 function BGCOND.RND1P() return math.random(1,10000)<100 end 
 function BGCOND.RND10P() return math.random(1,10000)<1000 end 
 function BGCOND.ANMFIN(s) return s.anim_end<CurTime() end 
+function BGCOND.MOVEKEYSDOWN(s,e) return e:KeyDown(IN_FORWARD) or e:KeyDown(IN_BACK) or e:KeyDown(IN_MOVELEFT) or e:KeyDown(IN_MOVERIGHT) end 
+function BGCOND.MOVEKEYSUP(s,e) return !(e:KeyDown(IN_FORWARD) or e:KeyDown(IN_BACK) or e:KeyDown(IN_MOVELEFT) or e:KeyDown(IN_MOVERIGHT)) end 
 function BGACT.SANIM(ent,anim,startfrom,lengthmul) 
 	lengthmul = lengthmul or 1
 	local sid =  ent:LookupSequence(anim)    

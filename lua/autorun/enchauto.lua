@@ -7,7 +7,7 @@ include("_classcore/init.lua")
  
 Dota = Dota or {}
     
- 
+  
 if SERVER then
 	util.AddNetworkString( "dota_hero_event" )
 end
@@ -25,7 +25,7 @@ local function nReceive( len, pl )
 			else
 				ent.dh_seqreset = reset
 			end
-			ent.dh_seqid = sequence 
+			ent.dh_seqid = sequence  
 		else
 			//ent.dh_seqreset = ent.dh_seqid != sequence
 			//ent.dh_seqid = sequence 
@@ -45,7 +45,7 @@ local function nReceive( len, pl )
 			MagicEffect(effectname):Cast(target)
 		end
 	end        
-end 
+end  
 
 net.Receive( "dota_hero_event", nReceive)
  
@@ -191,7 +191,7 @@ local function HOOK_PlayerSpawn( ply )
 		//Dota.PlaySequence2(ply, "spawn",true)      
 		return true 
 	end      
-end             
+end              
 local lastthink = {}
 local function HOOK_PlayerPostThink( ply )
 	if(ply.dotahero!=nil) and ply:Alive() then
@@ -259,6 +259,7 @@ local function HOOK_PlayerFootstep( ply, pos, foot, sound, volume, rf )
 end    
 local function HOOK_SetupMove( ply, mv, cmd )
 	if(ply.dotahero!=nil and not ply.dotahero.isplayermodel) then 
+		//MsgN(ply) 
 		local controller = ply:GetNWEntity("owner")
 		if SERVER then  
 			local mount = ply.mount
@@ -279,40 +280,59 @@ local function HOOK_SetupMove( ply, mv, cmd )
 				Dota.Dismount(ply)
 			end 
 		end
-		if ply.dotahero.move_allow_forward45 and mv:KeyDown( IN_FORWARD) then
-			ply:SetPoseParameter("body_yaw", ply:GetVelocity():Dot(-ply:GetRight()))
+		if ply.dotahero.use_move_yaw then
+			local move_x = mv:GetForwardSpeed(  )
+			local move_y = -mv:GetSideSpeed(  )
+			local vec = Vector(move_x,move_y,0) 
+			ply:SetPoseParameter("move_yaw", vec:Angle().y) 
+		end
+		if (ply.dotahero.move_allow_forward45 or ply.dotahero.move_allow_fullrotation)  and mv:KeyDown( IN_FORWARD) then
+			
+			if not ply.dotahero.move_allow_fullrotation then
+				ply:SetPoseParameter("body_yaw", ply:GetVelocity():Dot(-ply:GetRight()))
+			end
 		else
-			ply:SetPoseParameter("body_yaw",0)
-			mv:SetSideSpeed( 0 )
-		end 
-		mv:SetUpSpeed( 0 )
-		if false and controller != nil and controller !=NULL then 
+			if ply.dotahero.move_allow_fullrotation then
+			  
+			else 
+				ply:SetPoseParameter("body_yaw",0)
+				mv:SetSideSpeed( 0 )
+			end
+		end     
+		if ply.overrideX then mv:SetForwardSpeed(ply.overrideX) end
+		if ply.overrideY then mv:SetSideSpeed(ply.overrideY) end
+		if ply.overrideA then ply:SetEyeAngles(ply.overrideA) end
+		
+		mv:SetUpSpeed( 0 ) 
+		if false and controller != nil and controller !=NULL then  
 			local spd = math.max(0, controller:GetNWFloat("c_speed"))
 			mv:SetMaxSpeed( spd )
 			mv:SetMaxClientSpeed( spd )
 			mv:SetForwardSpeed(spd )
 			local ma =controller:GetNWAngle("c_vang") or mv:GetMoveAngles()
-			mv:SetMoveAngles(ma)
+			mv:SetMoveAngles(ma)  
 			//mv:SetAngles( ma )
 			if spd>0.01 then ply:SetEyeAngles(ma) end
 			if(	ply._anim_attack!=1 and controller:GetNWBool("c2_attack") ) then  
 				ply._anim_attack = 1
-			end
-			if(	ply._anim_cast!=1 and controller:GetNWBool("c2_jump")   ) then  
+			end 
+			if(	ply._anim_cast!=1 and controller:GetNWBool("c2_jump")   ) then   
 				ply._anim_cast = 1
 				MsgN(controller:GetNWBool("c2_jump"))
 			end 
 		else 
 			local mount = ply.mount
-			if mount == nil then
-				mv:SetForwardSpeed( math.max(0, mv:GetForwardSpeed()))
+			if mount == nil then 
+				if ply.dotahero.move_allow_fullrotation != true then 
+					mv:SetForwardSpeed( math.max(0, mv:GetForwardSpeed())) 
+				end
 				if(	ply._anim_attack!=1 and mv:KeyPressed( IN_ATTACK) ) then  
 					ply._anim_attack = 1
 				end
 				if(	ply._anim_cast!=1 and mv:KeyPressed( IN_JUMP)   ) then  
 					ply._anim_cast = 1 
 				end
-			end
+			end   
 		end
 		  
 		 
@@ -346,6 +366,37 @@ local function HOOK_SetupMove( ply, mv, cmd )
 			ply.dh_currentanim = nil 
 		end 
 		mv:RemoveKeys( IN_JUMP  )
+		
+		if SERVER then
+			if ply.pose then 
+				for k,v in pairs(ply.pose) do
+					//ply:SetPoseParameter(k,v)
+					//MsgN(k,"-",v) 
+					ply:SetNWFloat("pose_"..k,v)
+				end 
+			end 
+		
+		end
+		if CLIENT then
+			for k=1,ply:GetNumPoseParameters() do
+				//
+				local ppname = ply:GetPoseParameterName( k )
+				if ppname then
+					local val = ply:GetNWFloat("pose_"..ppname,-9999)
+					if(val>-9990)then
+						ply:SetPoseParameter(ppname,val)
+					end
+				end
+			end
+			//if ply.pose then 
+			//	for k,v in pairs(ply.pose) do
+			//		ply:SetPoseParameter(k,v)
+			//		//MsgN(k,"-",v)
+			//	end 
+			//end 
+			/////ply:InvalidateBoneCache()
+		end
+		//ply:ClearPoseParameters()
 	end  
 end    
 local function HOOK_FindUseEntity(  ply,  defaultEnt )	 
@@ -396,18 +447,32 @@ end
 local function HOOK_PlayerButtonUp(  ply,  button  )  
 	if SERVER and ply.dotahero then
 		ply.keyspressed[button] = nil      
-	end        
-end   
+	end         
+end    
 local function HOOK_KeyPress(  ply,  button  )
 	if SERVER and ply.dotahero then
 		local kh_d = ply.dotahero.inkeyhook[button]
 		if kh_d then Dota.Cast(ply, kh_d) end
 	end     
-end     
+end   
+
+local function HOOK_EntityEmitSound( t )
+	if t.Entity and t.Entity.dotahero then
+		if t.Entity.dotahero.Footstep then
+			if string.find( t.SoundName, "footstep") then
+				//MsgN(t.SoundName)
+				t.SoundName = t.Entity.dotahero:Footstep(t.Entity)
+				//MsgN(t.SoundName)   
+				return true
+			end
+		end
+	end   
+end  
+  
 hook.Add( "SetupMove", "DOTAHERO",  HOOK_SetupMove)
 hook.Add( "PlayerLoadout", "DOTAHERO",HOOK_PlayerLoadout )
 hook.Add( "TranslateActivity", "DOTAHERO", HOOK_TranslateActivity)
-hook.Add( "PlayerSetModel", "DOTAHERO", HOOK_PlayerSetModel) 
+hook.Add( "PlayerSetModel", "DOTAHERO", HOOK_PlayerSetModel)   
 hook.Add( "PlayerSpawn", "DOTAHERO", HOOK_PlayerSpawn)
 hook.Add( "CalcMainActivity", "DOTAHERO", HOOK_CalcMainActivity)
 hook.Add( "UpdateAnimation", "DOTAHERO", HOOK_UpdateAnimation )
@@ -419,15 +484,20 @@ hook.Add( "PlayerPostThink", "DOTAHERO", HOOK_PlayerPostThink )
 hook.Add( "PlayerButtonDown", "DOTAHERO", HOOK_PlayerButtonDown )
 hook.Add( "PlayerButtonUp", "DOTAHERO", HOOK_PlayerButtonUp )
 hook.Add( "KeyPress", "DOTAHERO", HOOK_KeyPress )
+hook.Add( "EntityEmitSound", "DOTAHERO", HOOK_EntityEmitSound )
 //hook.Add( "DoAnimationEvent", "DOTAHERO", HOOK_DoAnimationEvent )
-     
-concommand.Add( "arena_setchar", function(ply,cmd,args)
-	local e = (Entity or Entity)(tonumber(args[1]))
-	if e then  
-		character.Set(e,args[2]) 
-	end  
-end)  
- 
+
+if SERVER then
+	concommand.Add( "arena_setchar", function(ply,cmd,args)
+		local e = (Entity or Entity)(tonumber(args[1]))
+		if e then  
+			character.Set(e,args[2]) 
+		end  
+	end)  
+	concommand.Add( "arena_reload", function(ply,cmd,args)
+		include("autorun/enchauto.lua"); 
+	end)  
+end
 
 
 
